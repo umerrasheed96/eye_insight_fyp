@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "165947028420",
+    "project_id": "sight-insight",
+    "storage_bucket": "sight-insight.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:165947028420:android:081722e9358ebc091d2a91",
+        "android_client_info": {
+          "package_name": "com.example.eyeinsider"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjp-OH2brN-DhFLJA7gBWBRh0ae9XMK1Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
