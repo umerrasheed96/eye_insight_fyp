@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Retinal Disease Classifier</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+
+    <header>
+      <div class="logo">
+        <span class="logo-icon">👁️</span>
+        <div>
+          <div class="logo-title">RetinaScan AI</div>
+          <div class="logo-sub">Retinal Disease Detection</div>
+        </div>
+      </div>
+      <div id="status-badge" class="badge checking">Checking...</div>
+    </header>
+
+    <main>
+      <div class="card">
+
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="fileInput" accept="image/*" hidden />
+          <div class="upload-icon">🔬</div>
+          <p class="upload-title">Retinal Image Upload Karein</p>
+          <p class="upload-sub">OCT scan ya fundus image — PNG, JPG, JPEG supported</p>
+          <button class="btn-upload" onclick="document.getElementById('fileInput').click()">
+            Image Select Karein
+          </button>
+        </div>
+
+        <div class="preview-section" id="previewSection" style="display:none">
+          <img id="previewImg" src="" alt="Retinal Scan Preview" />
+          <button class="btn-clear" id="clearBtn">✕</button>
+        </div>
+
+        <button class="btn-classify" id="classifyBtn" disabled>
+          🔍 Scan Analyze Karein
+        </button>
+
+        <div class="loader" id="loader" style="display:none">
+          <div class="spinner"></div>
+          <p>AI model analyze kar raha hai...</p>
+        </div>
+
+        <div class="main-result" id="mainResult" style="display:none">
+          <div class="result-header-row">
+            <span class="result-label-text">Primary Diagnosis</span>
+            <span class="severity-badge" id="severityBadge"></span>
+          </div>
+          <div class="diagnosis-name" id="diagnosisName"></div>
+          <div class="diagnosis-full" id="diagnosisFull"></div>
+          <div class="confidence-row">
+            <span>Confidence</span>
+            <span id="confidenceVal" class="conf-val"></span>
+          </div>
+          <div class="bar-bg">
+            <div class="bar-fill" id="mainBar" style="width:0%"></div>
+          </div>
+          <div class="description-box" id="descriptionBox"></div>
+        </div>
+
+        <div class="results-section" id="resultsSection" style="display:none">
+          <h3 class="results-title">📊 All Predictions</h3>
+          <div id="resultsList"></div>
+        </div>
+
+        <div class="disclaimer" id="disclaimer" style="display:none">
+          ⚠️ <strong>Disclaimer:</strong> Yeh AI tool sirf educational purposes ke liye hai. Kisi bhi medical decision ke liye qualified ophthalmologist se zaroor consult karein.
+        </div>
+
+        <div class="error-box" id="errorBox" style="display:none"></div>
+
+      </div>
+    </main>
+
+    <footer>RetinaScan AI — Powered by YOLO + FastAPI 🔥</footer>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
