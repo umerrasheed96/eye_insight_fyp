@@ -5,7 +5,7 @@ extension BuildContextExtensions on BuildContext {
 
   IconButtonThemeData get iconTheme => Theme.of(this).iconButtonTheme;
 
-  InputDecorationTheme get inputDecorationTheme =>
+  InputDecorationThemeData get inputDecorationTheme =>
       Theme.of(this).inputDecorationTheme;
 }
 
