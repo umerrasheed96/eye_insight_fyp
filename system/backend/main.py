@@ -1,5 +1,6 @@
 import io
 import os
+import gdown
 from PIL import Image
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,22 +19,21 @@ app.add_middleware(
 )
 
 # ─── Config ─────────────────────────────────────────────────────────────────
-MODEL_PATH = "model/model.pt"   # apni .pt file yahan rakhein
+MODEL_PATH = "model/model.pt"
 
-def random_text():
-    texts = [
-        "Hello world!",
-        "Python is fun",
-        "OpenAI is amazing",
-        "I love coding",
-        "Have a great day",
-        "Keep learning",
-        "Random text generator",
-        "Stay positive",
-        "Work hard, play hard",
-        "Success is near"
-    ]
-    return random.choice(texts)
+# ⚠️ APNI GOOGLE DRIVE FILE ID YAHAN LAGAO
+GOOGLE_DRIVE_FILE_ID = "1QATQWuekI9TJH3186qCp6jEEAYvQ4WVR"
+
+def download_model():
+    """Model Google Drive se download karo agar local nahi hai"""
+    os.makedirs("model", exist_ok=True)
+    if not os.path.exists(MODEL_PATH):
+        print("[INFO] model.pt nahi mila — Google Drive se download ho raha hai...")
+        url = f"https://drive.google.com/uc?id={GOOGLE_DRIVE_FILE_ID}"
+        gdown.download(url, MODEL_PATH, quiet=False)
+        print("[OK] model.pt download complete!")
+    else:
+        print("[OK] model.pt already exists — skip download")
 
 # ─── Disease Info ────────────────────────────────────────────────────────────
 DISEASE_INFO = {
@@ -62,6 +62,7 @@ model = None
 
 def load_model():
     global model
+    download_model()  # pehle download karo
     if not os.path.exists(MODEL_PATH):
         print(f"[WARNING] Model file not found: {MODEL_PATH}")
         return
@@ -91,24 +92,21 @@ async def predict(file: UploadFile = File(...)):
     if model is None:
         raise HTTPException(
             status_code=503,
-            detail="Model load nahi hua. model/model.pt rakhein aur server restart karein."
+            detail="Model load nahi hua. Server restart karein."
         )
 
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="Sirf image files allowed hain.")
 
     try:
-        # Image read
         contents = await file.read()
         image = Image.open(io.BytesIO(contents)).convert("RGB")
 
-        # YOLO Inference
         results = model(image, verbose=False)
         result  = results[0]
 
         predictions = []
 
-        # ── Classification model (probs available) ──────────────────────
         if result.probs is not None:
             probs = result.probs
             top_indices = probs.top5
@@ -125,9 +123,7 @@ async def predict(file: UploadFile = File(...)):
                     "color":       info.get("color", "#6366f1"),
                 })
 
-        # ── Detection model (boxes available) ───────────────────────────
         elif result.boxes is not None and len(result.boxes) > 0:
-            # Count detections per class, pick highest confidence per class
             class_best = {}
             for box in result.boxes:
                 cls  = int(box.cls[0])
@@ -135,7 +131,6 @@ async def predict(file: UploadFile = File(...)):
                 if cls not in class_best or conf > class_best[cls]:
                     class_best[cls] = conf
 
-            # Sort by confidence descending
             sorted_classes = sorted(class_best.items(), key=lambda x: x[1], reverse=True)
             for cls, conf in sorted_classes:
                 label = model.names[cls]
@@ -149,7 +144,6 @@ async def predict(file: UploadFile = File(...)):
                     "color":       info.get("color", "#6366f1"),
                 })
 
-        # ── No detections — return Normal ────────────────────────────────
         if not predictions:
             info = DISEASE_INFO.get("NORMAL", {})
             predictions.append({
